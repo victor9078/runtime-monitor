@@ -1,0 +1,89 @@
+# ==========================================
+# Runtime Monitor Configuration
+# ==========================================
+
+runtime:
+  name: Runtime Monitor
+  version: 0.1.0
+  hostname: auto
+  heartbeat_seconds: 15
+
+logging:
+  level: INFO
+  directory: logs
+  retain_days: 30
+
+monitors:
+
+  process:
+    enabled: true
+    interval_seconds: 15
+
+  cpu:
+    enabled: true
+    interval_seconds: 30
+
+  memory:
+    enabled: true
+    interval_seconds: 30
+
+  disk:
+    enabled: true
+    interval_seconds: 60
+
+  network:
+    enabled: true
+    interval_seconds: 60
+
+  files:
+    enabled: false
+    interval_seconds: 60
+
+processes:
+
+  - name: Runtime
+    match: publish_runtime.py
+    required: true
+
+  - name: Sheet Watcher
+    match: sheet_watcher.py
+    required: true
+
+  - name: Internet Health
+    match: internet_health.py
+    required: true
+
+  - name: FFmpeg
+    match: ffmpeg.exe
+    required: false
+
+drives:
+
+  - C:
+
+disk_thresholds:
+
+  warning_gb: 20
+  critical_gb: 10
+  emergency_gb: 5
+
+alerts:
+
+  process_stopped: true
+  low_disk: true
+  high_cpu: true
+  high_memory: true
+  network_offline: true
+
+history:
+
+  enabled: false
+  retention_days: 30
+  
+database:
+
+services:
+
+dashboard:
+
+discord:
