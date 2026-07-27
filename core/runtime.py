@@ -49,8 +49,10 @@ class Runtime:
             self.running = False
             
     def tick(self):
+
         self.process_monitor.sample()
-        #print("Heartbeat")        
+
+        print(self.process_monitor.get_snapshot())   
 
     def shutdown(self):
 
