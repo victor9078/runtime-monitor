@@ -5,6 +5,7 @@ Runtime Monitor
 import time
 from monitors.process_monitor import ProcessMonitor
 from config.configuration import Configuration
+from runtime_event import RuntimeEvent
 
 
 class Runtime:
@@ -57,14 +58,17 @@ class Runtime:
         current_snapshot = self.process_monitor.get_snapshot()
 
         if self.previous_snapshot is not None:
-            self.compare_snapshots(
+            changes = self.compare_snapshots(
                 self.previous_snapshot,
                 current_snapshot
             )
-
+            for change in changes:
+                print(change)
+                
         self.previous_snapshot = current_snapshot 
 
     def compare_snapshots(self, previous, current):
+        changes = []
 
         for name in current:
 
@@ -74,8 +78,16 @@ class Runtime:
                 old_state = "Running" if old["running"] else "Stopped"
                 new_state = "Running" if new["running"] else "Stopped"
 
-                print(f"{name}: {old_state} → {new_state}")
-            
+                changes.append(
+                    RuntimeEvent(
+                        component=name,
+                        field="running",
+                        old=old["running"],
+                        new=new["running"]
+                    )
+                )
+                
+        return changes    
             
 
     def shutdown(self):
