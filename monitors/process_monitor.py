@@ -17,11 +17,24 @@ class ProcessMonitor(Monitor):
 
         print(f"{self.name} initialized.")
 
-        for process in self.processes:
-            print(f"  {process['name']}")
+        
 
     def sample(self):
-        print(f"{self.name} sample.")
+        import psutil
+
+        for proc in psutil.process_iter(["pid", "name", "cmdline"]):
+
+            info = proc.info
+
+            cmdline = info.get("cmdline")
+
+            if not cmdline:
+                continue
+
+            cmdline_text = " ".join(cmdline)
+
+            if ".py" in cmdline_text.lower():
+                print(info)
 
     def get_snapshot(self):
         return {

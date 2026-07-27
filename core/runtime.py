@@ -24,7 +24,7 @@ class Runtime:
 
         self.processes = self.configuration.get_processes()
 
-        self.process_monitor = ProcessMonitor(processes)
+        self.process_monitor = ProcessMonitor(self.processes)
 
         self.process_monitor.initialize()
 
@@ -53,6 +53,10 @@ class Runtime:
         #print("Heartbeat")        
 
     def shutdown(self):
+
         print("Stopping Runtime...")
-        self.process_monitor.shutdown()
+
+        if self.process_monitor:
+            self.process_monitor.shutdown()
+
         self.running = False
