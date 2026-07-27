@@ -8,6 +8,18 @@ It describes the information the Runtime maintains about the operating environme
 
 The Runtime Model is implementation-independent and serves as the authoritative reference for developers and future system components.
 
+## Design Principle
+
+Runtime Monitor is an observation system.
+
+Monitors collect observations.
+
+The Runtime maintains current state.
+
+Events are generated from changes in state, not from observations themselves.
+
+Actions (logging, notifications, restarts, dashboards) respond to events rather than interacting directly with monitors.
+
 ## Core Objects 
 
 ### Runtime

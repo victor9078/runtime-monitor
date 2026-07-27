@@ -14,6 +14,8 @@ class Runtime:
         
         self.configuration = Configuration()
         
+        self.previous_snapshot = None
+        
         self.running = False
 
     def initialize(self):
@@ -52,7 +54,29 @@ class Runtime:
 
         self.process_monitor.sample()
 
-        print(self.process_monitor.get_snapshot())   
+        current_snapshot = self.process_monitor.get_snapshot()
+
+        if self.previous_snapshot is not None:
+            self.compare_snapshots(
+                self.previous_snapshot,
+                current_snapshot
+            )
+
+        self.previous_snapshot = current_snapshot 
+
+    def compare_snapshots(self, previous, current):
+
+        for name in current:
+
+            old = previous[name]
+            new = current[name]
+            if old["running"] != new["running"]:
+                old_state = "Running" if old["running"] else "Stopped"
+                new_state = "Running" if new["running"] else "Stopped"
+
+                print(f"{name}: {old_state} → {new_state}")
+            
+            
 
     def shutdown(self):
 
