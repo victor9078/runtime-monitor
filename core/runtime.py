@@ -6,18 +6,22 @@ import time
 from monitors.process_monitor import ProcessMonitor
 from config.configuration import Configuration
 from runtime_event import RuntimeEvent
+from core.registry import Registry
+
 
 
 class Runtime:
 
     def __init__(self):
-        self.process_monitor = None
+        
         
         self.configuration = Configuration()
         
         self.previous_snapshot = None
         
         self.running = False
+        
+        self.registry = Registry()
 
     def initialize(self):
 
@@ -25,11 +29,13 @@ class Runtime:
 
         self.configuration.load()
 
-        self.processes = self.configuration.get_processes()
+        processes = self.configuration.get_processes()
 
-        self.process_monitor = ProcessMonitor(self.processes)
+        process_monitor = ProcessMonitor(processes)
 
-        self.process_monitor.initialize()
+        process_monitor.initialize()
+
+        self.registry.register(process_monitor)
 
         self.running = True
     
@@ -53,19 +59,23 @@ class Runtime:
             
     def tick(self):
 
-        self.process_monitor.sample()
+        for monitor in self.registry.get_monitors():
 
-        current_snapshot = self.process_monitor.get_snapshot()
+            monitor.sample()
 
-        if self.previous_snapshot is not None:
-            changes = self.compare_snapshots(
-                self.previous_snapshot,
-                current_snapshot
-            )
-            for change in changes:
-                print(change)
-                
-        self.previous_snapshot = current_snapshot 
+            current_snapshot = monitor.get_snapshot()
+
+            if self.previous_snapshot is not None:
+
+                changes = self.compare_snapshots(
+                    self.previous_snapshot,
+                    current_snapshot
+                )
+
+                for change in changes:
+                    print(change)
+
+            self.previous_snapshot = current_snapshot
 
     def compare_snapshots(self, previous, current):
         changes = []

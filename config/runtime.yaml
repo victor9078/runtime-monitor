@@ -41,8 +41,8 @@ monitors:
 
 processes:
 
-  - name: Runtime
-    match: publish_runtime.py
+  - name: JSON Publisher
+    match: json_publisher.py
     required: true
 
   - name: Sheet Watcher
