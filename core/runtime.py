@@ -7,6 +7,7 @@ from monitors.process_monitor import ProcessMonitor
 from config.configuration import Configuration
 from runtime_event import RuntimeEvent
 from core.registry import Registry
+from snapshots.runtime_snapshot import RuntimeSnapshot
 
 
 
@@ -59,34 +60,42 @@ class Runtime:
             
     def tick(self):
 
+        current_snapshot = RuntimeSnapshot()
+
         for monitor in self.registry.get_monitors():
 
             monitor.sample()
 
-            current_snapshot = monitor.get_snapshot()
+            current_snapshot.add_monitor_snapshot(
+                monitor.__class__.__name__,
+                monitor.get_snapshot()
+            )
 
-            if self.previous_snapshot is not None:
+        if self.previous_snapshot is not None:
 
-                changes = self.compare_snapshots(
-                    self.previous_snapshot,
-                    current_snapshot
-                )
+            changes = self.compare_snapshots(
+                self.previous_snapshot,
+                current_snapshot
+            )
 
-                for change in changes:
-                    print(change)
+            for change in changes:
+                print(change)
 
-            self.previous_snapshot = current_snapshot
+        self.previous_snapshot = current_snapshot
 
     def compare_snapshots(self, previous, current):
+
         changes = []
 
-        for name in current:
+        previous_processes = previous.get_monitor_snapshot("ProcessMonitor")
+        current_processes = current.get_monitor_snapshot("ProcessMonitor")
 
-            old = previous[name]
-            new = current[name]
+        for name in current_processes:
+
+            old = previous_processes[name]
+            new = current_processes[name]
+
             if old["running"] != new["running"]:
-                old_state = "Running" if old["running"] else "Stopped"
-                new_state = "Running" if new["running"] else "Stopped"
 
                 changes.append(
                     RuntimeEvent(
@@ -96,15 +105,15 @@ class Runtime:
                         new=new["running"]
                     )
                 )
-                
-        return changes    
+
+        return changes
             
 
     def shutdown(self):
 
         print("Stopping Runtime...")
 
-        if self.process_monitor:
-            self.process_monitor.shutdown()
+        for monitor in self.registry.get_monitors():
+            monitor.shutdown()
 
         self.running = False
