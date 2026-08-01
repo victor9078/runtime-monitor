@@ -58,8 +58,7 @@ processes:
     required: false
 
 drives:
-
-  - C:
+  - "C:"
 
 disk_thresholds:
 

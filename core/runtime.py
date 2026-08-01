@@ -8,6 +8,7 @@ from config.configuration import Configuration
 from runtime_event import RuntimeEvent
 from core.registry import Registry
 from snapshots.runtime_snapshot import RuntimeSnapshot
+from monitors.disk_monitor import DiskMonitor
 
 
 
@@ -37,6 +38,14 @@ class Runtime:
         process_monitor.initialize()
 
         self.registry.register(process_monitor)
+
+        drives = self.configuration.get_drives()
+
+        disk_monitor = DiskMonitor(drives)
+
+        disk_monitor.initialize()
+
+        self.registry.register(disk_monitor)
 
         self.running = True
     

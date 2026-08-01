@@ -23,3 +23,6 @@ class Configuration:
     def get_processes(self):
 
         return self.config.get("processes", [])
+        
+    def get_drives(self):
+        return self.config.get("drives", [])
