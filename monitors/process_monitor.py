@@ -4,6 +4,7 @@ Process Monitor
 
 from core.monitor import Monitor
 import psutil
+from core.logger import info
 
 
 class ProcessMonitor(Monitor):
@@ -17,7 +18,7 @@ class ProcessMonitor(Monitor):
 
     def initialize(self):
 
-        print(f"{self.name} initialized.")
+        info(f"{self.name} initialized.")
 
     def find_process(self, match):
         """
@@ -74,4 +75,4 @@ class ProcessMonitor(Monitor):
         
 
     def shutdown(self):
-        print(f"{self.name} stopped.")
+        info(f"{self.name} stopped.")

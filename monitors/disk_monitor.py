@@ -1,4 +1,5 @@
 import psutil
+from core.logger import info
 
 
 class DiskMonitor:
@@ -9,12 +10,12 @@ class DiskMonitor:
         self.snapshot = {}
 
     def initialize(self):
-        print(f"{self.__class__.__name__} initialized.")
+        info(f"{self.__class__.__name__} initialized.")
 
     def sample(self):
         
         self.snapshot = {}
-        print(self.drives)
+        
         for drive in self.drives:
 
             try:
@@ -32,9 +33,9 @@ class DiskMonitor:
                 self.snapshot[drive] = {
                     "available": False
                 }
-            print(self.snapshot)
+            
     def get_snapshot(self):
         return self.snapshot
 
     def shutdown(self):
-        print(f"{self.__class__.__name__} stopped.")
+        info(f"{self.__class__.__name__} stopped.")

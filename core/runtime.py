@@ -9,6 +9,7 @@ from runtime_event import RuntimeEvent
 from core.registry import Registry
 from snapshots.runtime_snapshot import RuntimeSnapshot
 from monitors.disk_monitor import DiskMonitor
+from core.logger import info
 
 
 
@@ -27,7 +28,7 @@ class Runtime:
 
     def initialize(self):
 
-        print("Initializing Runtime...")
+        info("Initializing Runtime...")
 
         self.configuration.load()
 
@@ -51,7 +52,7 @@ class Runtime:
     
     def run(self):
 
-        print("Runtime running...")
+        info("Runtime running...")
 
         try:
 
@@ -63,7 +64,7 @@ class Runtime:
 
         except KeyboardInterrupt:
 
-            print("\nRuntime caught Ctrl+C")
+            info("Runtime interrupted (Ctrl+C)")
 
             self.running = False
             
@@ -88,7 +89,7 @@ class Runtime:
             )
 
             for change in changes:
-                print(change)
+                info(str(change))
 
         self.previous_snapshot = current_snapshot
 
@@ -98,6 +99,8 @@ class Runtime:
 
         previous_processes = previous.get_monitor_snapshot("ProcessMonitor")
         current_processes = current.get_monitor_snapshot("ProcessMonitor")
+        previous_disks = previous.get_monitor_snapshot("DiskMonitor")
+        current_disks = current.get_monitor_snapshot("DiskMonitor")
 
         for name in current_processes:
 
@@ -115,12 +118,31 @@ class Runtime:
                     )
                 )
 
+        for drive in current_disks:
+
+            old = previous_disks.get(drive)
+            new = current_disks.get(drive)
+            
+            if old is None or new is None:
+                continue
+
+            if round(old["percent"]) != round(new["percent"]):
+
+                changes.append(
+                    RuntimeEvent(
+                        component=drive,
+                        field="percent",
+                        old=old["percent"],
+                        new=new["percent"]
+                    )
+                )
+        
         return changes
             
 
     def shutdown(self):
 
-        print("Stopping Runtime...")
+        info("Stopping Runtime...")
 
         for monitor in self.registry.get_monitors():
             monitor.shutdown()

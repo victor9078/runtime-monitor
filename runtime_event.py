@@ -14,7 +14,11 @@ class RuntimeEvent:
         
     def __str__(self):
 
-        old = "Running" if self.old else "Stopped"
-        new = "Running" if self.new else "Stopped"
+        if self.field == "running":
 
-        return f"{self.component}: {old} → {new}"
+            old = "Running" if self.old else "Stopped"
+            new = "Running" if self.new else "Stopped"
+
+            return f"{self.component}: {old} → {new}"
+
+        return f"{self.component}: {self.field} {self.old} → {self.new}"

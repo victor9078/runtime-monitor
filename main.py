@@ -1,4 +1,5 @@
 from core.runtime import Runtime
+from core.logger import info
 
 
 def main():
@@ -13,7 +14,7 @@ def main():
 
     except KeyboardInterrupt:
 
-        print("\nShutdown requested.")
+        log("\nShutdown requested.")
 
     finally:
 
