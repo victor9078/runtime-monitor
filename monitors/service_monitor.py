@@ -1,5 +1,5 @@
 """
-Process Monitor
+Service Monitor
 """
 
 from core.monitor import Monitor
@@ -7,13 +7,13 @@ import psutil
 from core.logger import info
 
 
-class ProcessMonitor(Monitor):
+class ServiceMonitor(Monitor):
 
-    def __init__(self, processes):
+    def __init__(self, services):
 
-        super().__init__("Process Monitor")
+        super().__init__("Service Monitor")
 
-        self.processes = processes
+        self.services = services
         self.snapshot = {}
 
     def initialize(self):
@@ -60,14 +60,16 @@ class ProcessMonitor(Monitor):
     def sample(self):
 
         self.snapshot = {}
+        # print("self.services =", self.services)
+        # print(type(self.services))
 
-        for process in self.processes:
+        for service in self.services:
 
-            status = self.find_process(process["match"])
+            status = self.find_process(service["match"])
 
-            self.snapshot[process["name"]] = {
+            self.snapshot[service["name"]] = {
                 **status,
-                "required": process["required"]
+                "required": service["required"]
             }
 
     def get_snapshot(self):

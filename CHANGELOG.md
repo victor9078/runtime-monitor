@@ -1,50 +1,33 @@
 # Changelog
 
-## Unreleased
+## v1.0.0 - 2026-08-06
 
-### Changed
-- Snapshot comparison now returns RuntimeEvent objects instead of printing directly.
-- Runtime consumes RuntimeEvent objects and is responsible for presenting changes.
+### Architecture
+- Introduced a registry-driven monitoring framework.
+- Added Monitor base class and extensible monitor architecture.
+- Added RuntimeSnapshot for aggregating monitor state.
+- Added RuntimeEvent for representing runtime state changes.
+- Added centralized timestamped logging.
 
-### Added
-- Introduced the RuntimeEvent model to represent runtime state changes.
-
-## Unreleased
-
-### Added
-- Created the Configuration class to load settings from `runtime.yaml`.
-- Runtime now loads configuration during initialization.
-- Process definitions are passed from Runtime to ProcessMonitor.
-- Established dependency injection between Runtime and ProcessMonitor.
-### Added
-- ProcessMonitor now builds structured process snapshots.
-- Runtime captures running status, PID, executable name, and command line for configured processes.
-- Optional and required process metadata are included in snapshots.
-
-## Unreleased
-
-### Added
-- Runtime detects process running/stopped state changes between polling intervals.
-- Process state transitions are reported to the console in a human-readable format.
-
-### Changed
-- ProcessMonitor now receives its configuration from Runtime instead of relying on hardcoded values.
-- Runtime initialization sequence now loads configuration before creating monitors.
-
-### RuntimeSnapshot Integration
-
-- Integrated RuntimeSnapshot into the Runtime execution pipeline.
-- Runtime now aggregates monitor snapshots into a single RuntimeSnapshot.
-- compare_snapshots() now compares RuntimeSnapshots instead of individual monitor snapshots.
-- Runtime shutdown now iterates over the Registry instead of directly managing ProcessMonitor.
-- Completed transition to a registry-driven monitoring architecture.
-
-### Disk Monitor
-
+### Monitors
+- Added ServiceMonitor (formerly ProcessMonitor).
 - Added DiskMonitor.
-- Added drive configuration support.
-- DiskMonitor collects total, used, free, and percentage used.
-- Runtime now hosts multiple monitor types through the Registry.
+- Added configuration-driven monitor registration.
+
+### Runtime
+- Runtime now aggregates snapshots from multiple monitors.
+- Snapshot comparison generates RuntimeEvents.
+- Runtime manages monitor lifecycle through the Registry.
+- Runtime performs graceful shutdown of registered monitors.
+
+### Configuration
+- Added runtime.yaml configuration.
+- Added Configuration loader.
+- Service definitions are configuration-driven.
+- Drive monitoring is configuration-driven.
+
+### Status
+Version 1 establishes the monitoring framework. Future releases will add heartbeat monitoring, recovery policies, and additional monitor types.
 
 ## v0.1.0 - 2026-07-26
 

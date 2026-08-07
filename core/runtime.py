@@ -3,13 +3,14 @@ Runtime Monitor
 """
 
 import time
-from monitors.process_monitor import ProcessMonitor
+from monitors.service_monitor import ServiceMonitor
 from config.configuration import Configuration
 from runtime_event import RuntimeEvent
 from core.registry import Registry
 from snapshots.runtime_snapshot import RuntimeSnapshot
 from monitors.disk_monitor import DiskMonitor
 from core.logger import info
+from notifiers.discord_notifier import Notifier
 
 
 
@@ -32,13 +33,15 @@ class Runtime:
 
         self.configuration.load()
 
-        processes = self.configuration.get_processes()
+        services = self.configuration.get_services()
+        # print("Runtime services:", services)
+        # print(type(services))
 
-        process_monitor = ProcessMonitor(processes)
+        service_monitor = ServiceMonitor(services)
 
-        process_monitor.initialize()
+        service_monitor.initialize()
 
-        self.registry.register(process_monitor)
+        self.registry.register(service_monitor)
 
         drives = self.configuration.get_drives()
 
@@ -49,6 +52,12 @@ class Runtime:
         self.registry.register(disk_monitor)
 
         self.running = True
+        
+        webhook = self.configuration.get_system_health_webhook()
+
+        mention = self.configuration.get_alert_mention()
+
+        self.notifier = Notifier(webhook, mention)
     
     def run(self):
 
@@ -89,23 +98,28 @@ class Runtime:
             )
 
             for change in changes:
+
                 info(str(change))
+
+                self.notifier.notify(change)
 
         self.previous_snapshot = current_snapshot
 
     def compare_snapshots(self, previous, current):
 
+
         changes = []
 
-        previous_processes = previous.get_monitor_snapshot("ProcessMonitor")
-        current_processes = current.get_monitor_snapshot("ProcessMonitor")
+        previous_services = previous.get_monitor_snapshot("ServiceMonitor")
+        current_services = current.get_monitor_snapshot("ServiceMonitor")
+
         previous_disks = previous.get_monitor_snapshot("DiskMonitor")
         current_disks = current.get_monitor_snapshot("DiskMonitor")
 
-        for name in current_processes:
+        for name in current_services:
 
-            old = previous_processes[name]
-            new = current_processes[name]
+            old = previous_services[name]
+            new = current_services[name]
 
             if old["running"] != new["running"]:
 
@@ -118,24 +132,24 @@ class Runtime:
                     )
                 )
 
-        for drive in current_disks:
+        # for drive in current_disks:
 
-            old = previous_disks.get(drive)
-            new = current_disks.get(drive)
+            # old = previous_disks.get(drive)
+            # new = current_disks.get(drive)
             
-            if old is None or new is None:
-                continue
+            # if old is None or new is None:
+                # continue
 
-            if round(old["percent"]) != round(new["percent"]):
+            # if round(old["percent"]) != round(new["percent"]):
 
-                changes.append(
-                    RuntimeEvent(
-                        component=drive,
-                        field="percent",
-                        old=old["percent"],
-                        new=new["percent"]
-                    )
-                )
+                # changes.append(
+                    # RuntimeEvent(
+                        # component=drive,
+                        # field="percent",
+                        # old=old["percent"],
+                        # new=new["percent"]
+                    # )
+                # )
         
         return changes
             

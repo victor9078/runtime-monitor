@@ -39,7 +39,7 @@ monitors:
     enabled: false
     interval_seconds: 60
 
-processes:
+services:
 
   - name: JSON Publisher
     match: json_publisher.py
@@ -69,6 +69,7 @@ disk_thresholds:
 alerts:
 
   process_stopped: true
+  # Reserved for future monitors
   low_disk: true
   high_cpu: true
   high_memory: true
@@ -81,8 +82,9 @@ history:
   
 database:
 
-services:
-
 dashboard:
 
 discord:
+    system_health_webhook: "https://discord.com/api/webhooks/1496331270941048883/QvqSPd4DwZhrKH83_M6ZPbfHn3K1-GoftuJemdzHn3dj5Dm2TuJOgnT4E0q2gZuOsmJZ"
+    
+    alert_mention: "<@1280351163304251412>"

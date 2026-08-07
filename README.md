@@ -1,30 +1,126 @@
-Operations Runtime
+# Runtime
 
-Runtime Monitor
+## Purpose
 
-Purpose
+Runtime provides centralized operational monitoring for the ALERTS ecosystem.
 
-Provide centralized health monitoring for the Incident Engine ecosystem.
+Runtime continuously monitors infrastructure services and system resources by collecting snapshots from one or more monitors, comparing those snapshots over time, and generating RuntimeEvents whenever monitored state changes.
 
-The Runtime Monitor observes the health of monitored processes, storage, network connectivity, system resources, and supporting services. It records operational events, detects abnormal conditions, and provides a single source of truth for overall system status.
+Runtime is infrastructure.
 
-It does not process scanner audio, publish incidents, or restart services.
+It does not:
+- Process scanner audio
+- Generate incidents
+- Publish operational data
+- Monitor scanner heartbeats (handled by Watchdog)
 
-Primary Components
-Runtime Service
-Process Monitor
-Storage Monitor
-Resource Monitor
-Network Monitor
-Event Engine
-Alert Engine
-Historical Storage
-Future Components
-Web Dashboard
-Discord Health Status
-REST API
-Service Control
-Metrics Export
+Instead, Runtime monitors the health of supporting infrastructure while Watchdog continues to monitor scanner application health.
+
+---
+
+## Current Features (v1)
+
+- Registry-based monitor architecture
+- ServiceMonitor
+- DiskMonitor
+- RuntimeSnapshot
+- RuntimeEvent
+- Centralized logging
+- Discord notification support
+- Configuration-driven services
+- Configuration-driven disk monitoring
+- Configuration-driven Discord webhook
+- Configuration-driven alert mention
+- Graceful startup and shutdown
+
+---
+
+## Architecture
+
+RRuntime
+    ↓
+Registry
+    ↓
+ServiceMonitor
+DiskMonitor
+    ↓
+RuntimeSnapshot
+    ↓
+RuntimeEvent
+    ↓
+Logger
+DiscordNotifier
+
+---
+
+## Current Monitors
+
+### ServiceMonitor
+
+Monitors configured long-running infrastructure services.
+
+Current examples:
+
+- JSON Publisher
+- Sheet Watcher
+- Internet Health
+- FFmpeg (optional)
+
+Generates RuntimeEvents whenever a service changes between Running and Stopped.
+
+---
+
+### DiskMonitor
+
+Monitors configured drives.
+
+Currently tracks:
+
+- Total space
+- Used space
+- Free space
+- Percent utilized
+
+Generates RuntimeEvents whenever utilization changes.
+
+Disk threshold configuration has been added for future alerting.
+
+---
+
+## Notifications
+
+Runtime can send Discord notifications for RuntimeEvents.
+
+Current notification types:
+
+- Service stopped
+- Service running
+
+Notifications support:
+
+- Configurable webhook
+- Optional Discord user mention
+
+---
+
+## Relationship to Watchdog
+
+Runtime and Watchdog serve different purposes.
+
+Runtime monitors:
+
+- Infrastructure services
+- System resources
+
+Watchdog monitors:
+
+- Scanner monitor heartbeats
+- Transcript freshness
+- Automatic scanner restarts
+
+Runtime currently complements Watchdog rather than replacing it.
+
+## Repository Layout
 
 ============
 tree
@@ -74,3 +170,15 @@ runtime-monitor/
 ├── logs/
 │
 └── tests/
+
+## Roadmap
+
+Version 1.1
+- HeartbeatMonitor
+- Threshold events
+- Log levels
+
+Version 2
+- Recovery policies
+- Additional monitors
+- Dashboard integration
